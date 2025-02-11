@@ -9,7 +9,8 @@ const routes: RouteRecordRaw[] = [
     {
         path: '/',
         component: () => import('@/components/dev_page.vue'),
-    }
+    },
+
 ]
 
 export default routes

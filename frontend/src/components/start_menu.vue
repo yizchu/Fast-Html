@@ -26,7 +26,6 @@
         <div v-if="selectedMenu === '2'">
 
         </div>
-
     </Card>
 </template>
 
