@@ -1,12 +1,16 @@
-# view-ui-project-ts
-This project build for Vue3, Vue-router, ViewUIPlus, TypeScript and Vite.
-## Install
+# Frontend of Fast-Html
+
+## 环境要求
+- Node.js >= 20.7.0
+- npm >= 10.8.2
+
+## Install Packages
 ```shell
 npm install
 ```
 ## Run
 ```shell
-npm run serve
+npm run dev
 ```
 ## Build
 ### Build for Production
