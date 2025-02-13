@@ -1,6 +1,6 @@
 # Frontend of Fast-Html
 
-## 环境要求
+## Environment
 - Node.js >= 20.7.0
 - npm >= 10.8.2
 
