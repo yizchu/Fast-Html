@@ -1,7 +1,9 @@
 <template>
     <div class="preview-header">
-        <p> Title: {{ page_title }}</p>
         <div class="button-container">
+            <button @click="toggleSidebar" class="toggle-sidebar-btn">
+                {{ showSidebar ? '隐藏具体' : '显示具体' }}
+            </button>
             <button :disabled="Mode2" @click="toggleMode1">
                 {{ Mode1 ? '退出单选' : '单选模式' }}
             </button>
@@ -33,16 +35,13 @@
             return {
                 zoomPercentage: 100,
                 zoomScale: 1,
+                showSidebar: false,
             };
         },
         computed: {
             ...mapState({
                 original_content: state => state.Page.original_content,
             }),
-            page_title(){
-                const match = this.original_content.match(/<title>(.*?)<\/title>/);
-                return match ? match[1] : '';
-            }
         },
         methods: {
             toggleMode1() {
@@ -66,6 +65,10 @@
                     this.zoomScale = this.zoomPercentage / 100;
                     this.$emit('zoomChanged', this.zoomScale);
                 }
+            },
+            toggleSidebar() {
+                this.showSidebar = !this.showSidebar;
+                this.$emit('toggleSidebar', this.showSidebar);
             },
         },
     }
@@ -109,5 +112,13 @@
 .preview-header p{
     font-size: 24px;
     font-weight: bold;
+}
+
+.preview-header .toggle-sidebar-btn {
+    background-color: #f39c12;
+}
+
+.preview-header .toggle-sidebar-btn:hover {
+    background-color: #e67e22;
 }
 </style>
