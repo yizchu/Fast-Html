@@ -1,0 +1,10 @@
+huggingface_hub
+python-dotenv
+psd-tools==1.9.34
+uvicorn
+pybase64
+fastapi
+gradio
+typing
+requests
+json5
