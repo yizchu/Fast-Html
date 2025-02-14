@@ -1,5 +1,3 @@
-import { createStore } from 'vuex';
-
 const settingStore = {
     namespaced: true,
     state: {
