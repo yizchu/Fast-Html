@@ -1,15 +1,18 @@
 <template>
     <div class="preview-pane">
-        <PreviewHeader :Mode1="Mode1" :Mode2="Mode2"
-            @updateMode1="Mode1 = $event" @updateMode2="Mode2 = $event" @zoomChanged="handleZoomChange" @toggleSidebar="toggleSidebar"/>
+        <PreviewHeader :Mode1="Mode1" :Mode2="Mode2" @updateMode1="Mode1 = $event" @updateMode2="Mode2 = $event"
+            @zoomChanged="handleZoomChange" @toggleSidebar="toggleSidebar" />
         <iframe ref="iframe" :srcdoc="html_css_content"></iframe>
     </div>
     <div v-if="showSidebar" class="floating-sidebar"
-        :style="{ top: panelPosition.top + 'px', left: panelPosition.left + 'px' }"
-        @mousedown="startDrag">
+        :style="{ top: panelPosition.top + 'px', left: panelPosition.left + 'px' }" @mousedown="startDrag">
         <h1> Body </h1>
-        <Tree :data="treeData" class="tree" expand-node
-            @mouseover="handleTreeHover"></Tree>
+        <Tree :data="treeData" class="tree" ref="tree" expand-node @on-contextmenu="handleContextMenu">
+            <template #contextMenu>
+                <DropdownItem @click="handleContextMenuCheck">查看/取消查看</DropdownItem>
+                <DropdownItem @click="handleContextMode">选取/取消选取</DropdownItem>
+            </template>
+        </Tree>
     </div>
 </template>
 
@@ -41,6 +44,8 @@ export default {
             startDragPosition: { x: 0, y: 0 },
             isDragging: false,
             treeData: null,
+            contextData: null,
+            selectedTreeNode: null,
         }
     },
     mounted() {
@@ -74,6 +79,10 @@ export default {
                     }
                 } catch (e) { }
                 this.updateEl(null);
+                const previousHighlighted = document.querySelectorAll('.ivu-tree-title');
+                previousHighlighted.forEach(node => {
+                    node.classList.remove('selected');
+                });
             }
         },
         Mode2(newVal) {
@@ -83,8 +92,31 @@ export default {
                     target.style.backgroundColor = '';
                 });
                 this.clearEls();
+                const previousHighlighted = document.querySelectorAll('.ivu-tree-title');
+                previousHighlighted.forEach(node => {
+                    node.classList.remove('selected');
+                });
             }
         },
+        showSidebar(newVal) {
+            if (!newVal) {
+                if (this.target) {
+                    if (this.target === this.selected_element || this.selected_elements.includes(this.target)) {
+                        this.target.style.backgroundColor = '';
+                    } else {
+                        this.target.style.backgroundColor = '';
+                        this.target.style.boxShadow = '';
+                    }
+                    this.target = null;
+                }
+            }
+            else if (Mode1){
+
+            }
+            else if (Mode2){
+
+            }
+        }
     },
     methods: {
         ...mapMutations('Page', ['updateEl', 'addEls', 'removeEls', 'clearEls']),
@@ -111,6 +143,7 @@ export default {
         },
         handleHover(event) {
             if (!(this.Mode1 || this.Mode2)) return;
+            if (event.target.tagName == 'HTML') return;
             if (this.target && this.target !== event.target) {
                 this.target.style.backgroundColor = '';
                 if (!(this.target === this.selected_element || this.selected_elements.includes(this.target))) {
@@ -181,45 +214,104 @@ export default {
             const iframe = this.$refs.iframe;
             const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
             const rootNode = {
-                tag: 'body',
+                target: null,
+                title: 'body',
+                contextmenu: true,
                 children: [],
             }
-
-            const recursiveBuildTree = (parentNode, nowElement) => {
+            const recursiveBuildTree = (parentNode, nowElement, tag) => {
                 const children = nowElement.children;
                 for (let i = 0; i < children.length; i++) {
                     const child = children[i];
                     const node = {
-                        tag: child.tagName.toLowerCase(),
-                        className: child.className,
-                        title: child.tagName.toLowerCase()
-                        + (child.className ? ` class = "${child.className}"` : ''
-                        + (child.tagName.toLowerCase()==='p' ? ` text = "${child.innerText}"` : '')),
+                        target: child,
+                        title: (tag? tag+'-' : '')+(i+1)+': '
+                            +child.tagName.toLowerCase()
+                            + (child.className ? ` class="${child.className}"` : ''
+                            + (child.tagName.toLowerCase() === 'p' ? ` text="${child.innerText}"` : '')),
                         children: [],
+                        contextmenu: true,
                     };
                     parentNode.children.push(node);
-                    recursiveBuildTree(node, child);
+                    recursiveBuildTree(node, child, (tag? tag+'-' : '')+(i+1));
                 }
             };
-
             const body = iframeDocument.querySelector('body');
-            recursiveBuildTree(rootNode, body);
+            recursiveBuildTree(rootNode, body, '');
             this.treeData = rootNode.children;
         },
-        handleTreeHover(event){
-            const hoveredNode = event.target;
-            const tag = hoveredNode.tag;
-            const className = hoveredNode.className;
-            const iframe = this.$refs.iframe;
-            const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-            const elements = iframeDocument.querySelectorAll(tag);
-            elements.forEach(el => {
-                if (el.className === className) {
-                    el.style.border = '2px solid red'; // 高亮边框
-                    el.style.backgroundColor = 'rgba(255, 0, 0, 0.1)'; // 高亮背景
+        handleContextMenu(node) {
+            this.contextData = node;
+        },
+        handleContextMenuCheck() {
+            if (this.target) {
+                this.target.style.backgroundColor = '';
+                if (!(this.target === this.selected_element || this.selected_elements.includes(this.target))) {
+                    this.target.style.boxShadow = '';
                 }
+                if (this.target===this.contextData.target){
+                    this.target = null;
+                    return;
+                }
+            }
+            this.target = this.contextData.target;
+            if (!(this.target === this.selected_element || this.selected_elements.includes(this.target))) {
+                this.target.style.boxShadow = '0px 0px 5px 2px rgba(255, 0, 0, 0.7)';
+            }
+            this.target.style.backgroundColor = 'rgba(0,0,255,0.1)';
+        },
+        addHighlightToTree(targetNode) {
+            this.$nextTick(() => {
+                const treeNodes = this.$refs.tree.$el.querySelectorAll('.ivu-tree-title');
+                treeNodes.forEach(node => {
+                    if (node.innerText === targetNode.title) {
+                        console.log(node);
+                        node.classList.add('selected');
+                    }
+                });
             });
-        }
+        },
+        removeHighlightFromTree(targetNode) {
+            this.$nextTick(() => {
+                const treeNodes = this.$refs.tree.$el.querySelectorAll('.ivu-tree-title');
+                treeNodes.forEach(node => {
+                    if (node.innerText === targetNode.title) {
+                        node.classList.remove('selected');
+                    }
+                });
+            });
+        },
+        handleContextMode() {
+            const node = this.contextData;
+            const targetNode = node.target;
+            if (this.Mode1) {
+                if (targetNode === this.selected_element) {
+                    this.selected_element.style.boxShadow = '';
+                    this.updateEl(null);
+                    this.removeHighlightFromTree(node);
+                    this.selectedTreeNode = null;
+                } else {
+                    if (this.selected_element) {
+                        this.selected_element.style.boxShadow = '';
+                        this.removeHighlightFromTree(this.selectedTreeNode);
+                    }
+                    this.updateEl(targetNode);
+                    this.selected_element.style.boxShadow = '0px 0px 5px 2px rgba(255, 0, 0, 0.7)';
+                    this.addHighlightToTree(node);
+                    this.selectedTreeNode = node;
+                }
+            } else if (this.Mode2) {
+                if (this.selected_elements.includes(targetNode)) {
+                    targetNode.style.boxShadow = '';
+                    this.removeEls(targetNode);
+                    this.removeHighlightFromTree(node);
+                } else {
+                    targetNode.style.boxShadow = '0px 0px 5px 2px rgba(255, 0, 0, 0.7)';
+                    this.addEls(targetNode);
+                    this.addHighlightToTree(node);
+                }
+            }
+        },
     }
 }
 </script>
@@ -296,9 +388,15 @@ export default {
     transition: transform 0.2s;
 }
 
-.floating-sidebar .ivu-tree-selected > .ivu-tree-title {
+.floating-sidebar .ivu-tree-selected>.ivu-tree-title {
     color: #2d8cf0;
     font-weight: bold;
+}
+
+.floating-sidebar .selected{
+    box-shadow : 0px 0px 5px 2px rgba(255, 0, 0, 0.7);
+    font-weight: bold;
+    color: #000;
 }
 
 ::-webkit-scrollbar {
