@@ -7,7 +7,8 @@
     <div v-if="showSidebar" class="floating-sidebar"
         :style="{ top: panelPosition.top + 'px', left: panelPosition.left + 'px' }" @mousedown="startDrag">
         <h1> Body </h1>
-        <Tree :data="treeData" class="tree" ref="tree" expand-node @on-contextmenu="handleContextMenu">
+        <Tree :data="treeData" class="tree" ref="tree" expand-node @on-contextmenu="handleContextMenu"
+            @on-toggle-expand="handleExpand">
             <template #contextMenu>
                 <DropdownItem @click="handleContextMenuCheck">查看/取消查看</DropdownItem>
                 <DropdownItem @click="handleContextMode">选取/取消选取</DropdownItem>
@@ -110,16 +111,48 @@ export default {
                     this.target = null;
                 }
             }
-            else if (Mode1){
-
+            else if (this.Mode1) {
+                if (this.selected_element) {
+                    this.treeData.some(rootNode => {
+                        const node = this.dfsAddHighlight(rootNode, this.selected_element);
+                        if (node) {
+                            rootNode.expand = true;
+                            this.addHighlightToTree(node);
+                            this.selectedTreeNode = node;
+                            return true;
+                        }
+                    });
+                }
             }
-            else if (Mode2){
-
+            else if (this.Mode2) {
+                this.selected_elements.forEach(targetNode => {
+                    this.treeData.some(rootNode => {
+                        const node = this.dfsAddHighlight(rootNode, targetNode);
+                        if (node) {
+                            rootNode.expand = true;
+                            this.addHighlightToTree(node);
+                            return true;
+                        }
+                    });
+                });
             }
         }
     },
     methods: {
         ...mapMutations('Page', ['updateEl', 'addEls', 'removeEls', 'clearEls']),
+        dfsAddHighlight(nowNode, targetNode) {
+            if (nowNode.target === targetNode) {
+                return nowNode;
+            }
+            const children = nowNode.children;
+            for (let i = 0; i < children.length; i++) {
+                const node = this.dfsAddHighlight(children[i], targetNode);
+                if (node) {
+                    children[i].expand = true;
+                    return node;
+                }
+            }
+        },
         handleZoomChange(newScale) {
             this.scale = newScale;
             this.applyZoomToIframe();
@@ -171,24 +204,51 @@ export default {
         handleClick(event) {
             if (this.Mode1) {
                 if (event.target === this.selected_element) {
+                    this.removeHighlightFromTree(this.selectedTreeNode);
                     this.selected_element.style.boxShadow = '';
                     this.updateEl(null);
                 } else {
                     try {
                         if (this.selected_element) {
                             this.selected_element.style.boxShadow = '';
+                            this.removeHighlightFromTree(this.selectedTreeNode);
                         }
                     } catch (e) { }
                     this.updateEl(event.target);
+                    this.treeData.some(rootNode => {
+                        const node = this.dfsAddHighlight(rootNode, this.selected_element);
+                        if (node) {
+                            rootNode.expand = true;
+                            this.addHighlightToTree(node);
+                            this.selectedTreeNode = node;
+                            return true;
+                        }
+                    });
                     this.target.style.boxShadow = '0px 0px 5px 2px rgba(255, 0, 0, 0.7)';
                 }
             } else if (this.Mode2) {
                 if (this.selected_elements.includes(event.target)) {
+                    this.treeData.some(rootNode => {
+                        const node = this.dfsAddHighlight(rootNode, event.target);
+                        if (node) {
+                            rootNode.expand = true;
+                            this.removeHighlightFromTree(node);
+                            return true;
+                        }
+                    });
                     event.target.style.boxShadow = '';
                     this.removeEls(event.target);
                 } else {
                     this.target.style.boxShadow = '0px 0px 5px 2px rgba(255, 0, 0, 0.7)';
                     this.addEls(event.target);
+                    this.treeData.some(rootNode => {
+                        const node = this.dfsAddHighlight(rootNode, event.target);
+                        if (node) {
+                            rootNode.expand = true;
+                            this.addHighlightToTree(node);
+                            return true;
+                        }
+                    });
                 }
             }
         },
@@ -225,15 +285,16 @@ export default {
                     const child = children[i];
                     const node = {
                         target: child,
-                        title: (tag? tag+'-' : '')+(i+1)+': '
-                            +child.tagName.toLowerCase()
+                        title: (tag ? tag + '-' : '') + (i + 1) + ': '
+                            + child.tagName.toLowerCase()
                             + (child.className ? ` class="${child.className}"` : ''
-                            + (child.tagName.toLowerCase() === 'p' ? ` text="${child.innerText}"` : '')),
+                                + (child.tagName.toLowerCase() === 'p' ? ` text="${child.innerText}"` : '')),
                         children: [],
                         contextmenu: true,
+                        expand: false,
                     };
                     parentNode.children.push(node);
-                    recursiveBuildTree(node, child, (tag? tag+'-' : '')+(i+1));
+                    recursiveBuildTree(node, child, (tag ? tag + '-' : '') + (i + 1));
                 }
             };
             const body = iframeDocument.querySelector('body');
@@ -249,7 +310,7 @@ export default {
                 if (!(this.target === this.selected_element || this.selected_elements.includes(this.target))) {
                     this.target.style.boxShadow = '';
                 }
-                if (this.target===this.contextData.target){
+                if (this.target === this.contextData.target) {
                     this.target = null;
                     return;
                 }
@@ -265,7 +326,6 @@ export default {
                 const treeNodes = this.$refs.tree.$el.querySelectorAll('.ivu-tree-title');
                 treeNodes.forEach(node => {
                     if (node.innerText === targetNode.title) {
-                        console.log(node);
                         node.classList.add('selected');
                     }
                 });
@@ -310,6 +370,16 @@ export default {
                     this.addEls(targetNode);
                     this.addHighlightToTree(node);
                 }
+            }
+        },
+        handleExpand(node) {
+            const children = node.children;
+            for (let i = 0; i < children.length; i++) {
+                const child = children[i];
+                if (child.target == this.selected_element || this.selected_elements.includes(child.target)) {
+                    this.addHighlightToTree(child);
+                }
+                this.handleExpand(child);
             }
         },
     }
@@ -393,8 +463,8 @@ export default {
     font-weight: bold;
 }
 
-.floating-sidebar .selected{
-    box-shadow : 0px 0px 5px 2px rgba(255, 0, 0, 0.7);
+.floating-sidebar .selected {
+    box-shadow: 0px 0px 5px 2px rgba(255, 0, 0, 0.7);
     font-weight: bold;
     color: #000;
 }
