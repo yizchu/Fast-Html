@@ -208,12 +208,10 @@ export default {
                     this.selected_element.style.boxShadow = '';
                     this.updateEl(null);
                 } else {
-                    try {
-                        if (this.selected_element) {
-                            this.selected_element.style.boxShadow = '';
-                            this.removeHighlightFromTree(this.selectedTreeNode);
-                        }
-                    } catch (e) { }
+                    if (this.selected_element) {
+                        this.selected_element.style.boxShadow = '';
+                        this.removeHighlightFromTree(this.selectedTreeNode);
+                    }
                     this.updateEl(event.target);
                     this.treeData.some(rootNode => {
                         const node = this.dfsAddHighlight(rootNode, this.selected_element);
@@ -323,22 +321,26 @@ export default {
         },
         addHighlightToTree(targetNode) {
             this.$nextTick(() => {
-                const treeNodes = this.$refs.tree.$el.querySelectorAll('.ivu-tree-title');
-                treeNodes.forEach(node => {
-                    if (node.innerText === targetNode.title) {
-                        node.classList.add('selected');
-                    }
-                });
+                try{
+                    const treeNodes = this.$refs.tree.$el.querySelectorAll('.ivu-tree-title');
+                    treeNodes.forEach(node => {
+                        if (node.innerText === targetNode.title) {
+                            node.classList.add('selected');
+                        }
+                    });
+                } catch (e) {}
             });
         },
         removeHighlightFromTree(targetNode) {
             this.$nextTick(() => {
-                const treeNodes = this.$refs.tree.$el.querySelectorAll('.ivu-tree-title');
-                treeNodes.forEach(node => {
-                    if (node.innerText === targetNode.title) {
-                        node.classList.remove('selected');
-                    }
-                });
+                try{
+                    const treeNodes = this.$refs.tree.$el.querySelectorAll('.ivu-tree-title');
+                    treeNodes.forEach(node => {
+                        if (node.innerText === targetNode.title) {
+                            node.classList.remove('selected');
+                        }
+                    });
+                } catch (e) {}
             });
         },
         handleContextMode() {

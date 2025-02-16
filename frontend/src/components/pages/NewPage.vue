@@ -74,9 +74,9 @@ export default {
                 if (res.data.status === 'success') {
                     this.$Notice.success({
                         title: 'Success',
-                        desc: `${res.data.file} 等 ${res.data.cnt} 个工程被成功创建。`
+                        desc: `${res.data.file} 等 ${res.data.cnt} 个工程被成功创建, 请刷新页面以选取打开。`
                     });
-                    this.$emit('update:show_newpage', false);
+                    this.close();
                 } else {
                     this.$Message.error('创建失败!');
                 }

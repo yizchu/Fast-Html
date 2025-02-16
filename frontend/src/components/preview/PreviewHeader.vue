@@ -13,11 +13,13 @@
             <button @click="decreaseZoom">-</button>
             <span>{{ zoomPercentage }}%</span>
             <button @click="increaseZoom">+</button>
+            <Icon type="md-download" class="download" @click="handleDownload"/>
         </div>
     </div>
 </template>
 
 <script>
+    import axios from 'axios';
     import { mapState } from 'vuex';
     export default {
         name: 'PreviewHeader',
@@ -40,7 +42,9 @@
         },
         computed: {
             ...mapState({
+                backend_url: state => state.Settings.backend_url,
                 original_content: state => state.Page.original_content,
+                page_name: state => state.Page.page_name,
             }),
         },
         methods: {
@@ -69,6 +73,25 @@
             toggleSidebar() {
                 this.showSidebar = !this.showSidebar;
                 this.$emit('toggleSidebar', this.showSidebar);
+            },
+            handleDownload() {
+                if (this.original_content) {
+                    axios.post(`${this.backend_url}/download-page/`, null, {
+                        responseType: 'blob'
+                    })
+                    .then((response) => {
+                        const blob = new Blob([response.data], { type: 'application/zip' });
+                        const link = document.createElement('a');
+                        const fileName = `${this.page_name || 'download'}.zip`;
+                        link.href = URL.createObjectURL(blob);
+                        link.download = fileName;
+                        link.click();
+                        URL.revokeObjectURL(link.href);
+                    })
+                    .catch((error) => {
+                        this.$Message.error('下载失败!');
+                    });
+                }
             },
         },
     }
@@ -120,5 +143,11 @@
 
 .preview-header .toggle-sidebar-btn:hover {
     background-color: #e67e22;
+}
+
+.download {
+    font-size: 24px;
+    margin-left: 30px;
+    cursor: pointer;
 }
 </style>
