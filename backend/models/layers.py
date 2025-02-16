@@ -15,6 +15,7 @@ class Layer:
         self.height: float = 0
         self.opacity: float = 0
         self.visible: bool = True
+        self.z_index: float = 0
 
     async def get_self_attributes(self):
         return (key for key in self.__dict__.keys())
@@ -31,9 +32,7 @@ class ImageLayer(Layer):
 
     async def generate_html(self) -> str:
         return f'''
-            <div class="{self.name}">
-                <img src="{self.image_path}" alt="Not Found!"/>
-            </div>\n
+            <img src="{self.image_path}" alt="Not Found!" class="{self.name}"/>
         '''
 
     async def generate_css(self) -> str:
@@ -45,7 +44,8 @@ class ImageLayer(Layer):
                 {f'top: {self.top}px;' if self.top else ''}\
                 {f'width: {self.width}px;' if self.width else ''}\
                 {f'height: {self.height}px;' if self.height else ''}\
-                {f'opacity: {self.opacity};' if self.opacity else ''}
+                {f'opacity: {self.opacity};' if self.opacity else ''}\
+                z-index: {self.z_index};
             }}
         '''
 
@@ -72,9 +72,7 @@ class TypeLayer(Layer):
 
     async def generate_html(self) -> str:
         return f'''
-            <div class="{self.name}">
-                <p>{self.text} </p>
-            </div>\n
+            <p class="{self.name}">{self.text} </p>
         '''
 
     async def generate_css(self) -> str:
@@ -87,6 +85,7 @@ class TypeLayer(Layer):
                 {f'width: {self.width}px;' if self.width else ''}\
                 {f'height: {self.height}px;' if self.height else ''}\
                 {f'opacity: {self.opacity};' if self.opacity else ''}\
+                z-index: {self.z_index};\
                 {f'font-family: {",".join(str(font) for font in self.font_family)};' if self.font_family else ''}\
                 {f'font-size: {self.font_size}px;' if self.font_size else ''}\
                 {f'color: rgba({self.fill_color[1] * 255}, {self.fill_color[2] * 255}, {self.fill_color[3] * 255}, {self.fill_color[0]});' if self.fill_color else ''}\

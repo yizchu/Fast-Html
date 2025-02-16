@@ -1,11 +1,17 @@
 import os
 import re
 import base64
+import shutil
 from fastapi import APIRouter, Body
+from fastapi.responses import FileResponse
 
 from dirs import results_dir
 
 router = APIRouter()
+
+page_path = None
+html_path = None
+css_path = None
 
 
 @router.get('/get-page/')
@@ -19,7 +25,7 @@ async def get_pages():
 
 @router.post('/open-page/')
 async def open_page(page_name: str = Body(..., embed=True)):
-    global html_path, css_path
+    global page_path, html_path, css_path
     page_path = os.path.join(results_dir, page_name)
     css_path = os.path.join(page_path, "static", "css")
     html_content = ""
@@ -50,7 +56,6 @@ async def open_page(page_name: str = Body(..., embed=True)):
     return {"status": "success", "html_css_content": html_css_content, "original_content": original_content}
 
 
-# 处理修改请求
 @router.post('/update-page/')
 async def update_page(html_css_content: str = Body(..., embed=True)):
     global html_path, css_path
@@ -61,3 +66,13 @@ async def update_page(html_css_content: str = Body(..., embed=True)):
     with open(css_path, 'w', encoding='utf-8') as f:
         f.write(css_content)
     return {"status": "success"}
+
+
+@router.post('/download-page/')
+async def download_page():
+    global page_path
+    shutil.make_archive(page_path, 'zip', page_path)
+    temp_dir = os.path.join(results_dir, f"{os.path.basename(page_path)}.zip")
+    response = FileResponse(temp_dir, media_type='application/zip')
+    response.headers["Content-Disposition"] = f"attachment; filename={os.path.basename(page_path)}"
+    return response

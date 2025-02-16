@@ -1,5 +1,3 @@
-import os
-import shutil
 import tracemalloc
 import logging
 from fastapi import FastAPI

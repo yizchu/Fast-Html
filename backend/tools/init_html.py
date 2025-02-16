@@ -1,9 +1,9 @@
 import os
 import asyncio
 from psd_tools import PSDImage
-from PIL import Image
-
+from PIL import Image, ImageFont, ImageDraw
 from models import layers
+import logging
 from tools import to_html
 
 
@@ -30,17 +30,17 @@ async def init_html(file_name, temp_path):
     style_content = ""
     html_content = await to_html.init_html_content(file_name)
     for index, root_layer in enumerate(psd_file._layers):
-        await get_layer(file_name, root_layer, user_info)
+        await get_layer(file_name, root_layer, user_info, index * 100)
     await to_html.end_html(html_content, f"results/{file_name}/{file_name}.html")
     await to_html.end_css(style_content, f"results/{file_name}/static/css/{file_name}.css")
 
 
-async def get_layer(file_name, layer, user_info):
+async def get_layer(file_name, layer, user_info, index):
     global html_content, style_content, html_content_lock, style_content_lock
     if layer.is_group():
         if layer.visible:
             for sub_layer in layer._layers:
-                await get_layer(file_name, sub_layer, user_info)
+                await get_layer(file_name, sub_layer, user_info, index)
     elif layer.visible:
         for replacement in layers.replacements:
             layer.name = layer.name.replace(replacement, '-')
@@ -53,9 +53,10 @@ async def get_layer(file_name, layer, user_info):
             typelayer.width = layer.width
             typelayer.height = layer.height
             typelayer.opacity = layer.opacity / 255
+            typelayer.z_index = index
             if typelayer.left > user_info['width'] or typelayer.top > user_info['height'] or typelayer.left + typelayer.width < 0 or typelayer.top + typelayer.height < 0:
                 return
-            typelayer.text = layer.text
+            typelayer.text = layer.text.strip()
             run_array = layer.engine_dict.get('StyleRun', {}).get('RunArray', [{}])
             style_sheet_data = run_array[0].get('StyleSheet', {}).get('StyleSheetData', {})
             properties = run_array[0].get('ParagraphSheet', {}).get('Properties', {})
@@ -73,7 +74,8 @@ async def get_layer(file_name, layer, user_info):
 
             # 误差校正
             typelayer.top -= 24
-            typelayer.width += 16
+            typelayer.width += 28
+            typelayer.height *= 2
 
             async with html_content_lock:
                 html_content += await typelayer.generate_html()
@@ -88,6 +90,7 @@ async def get_layer(file_name, layer, user_info):
             imagelayer.width = layer.width
             imagelayer.height = layer.height
             imagelayer.opacity = layer.opacity / 255
+            imagelayer.z_index = index
             if imagelayer.left > user_info['width'] or imagelayer.top > user_info['height'] or imagelayer.left + imagelayer.width < 0 or imagelayer.top + imagelayer.height < 0:
                 return
             layer_image = layer.composite()
