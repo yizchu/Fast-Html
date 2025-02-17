@@ -46,7 +46,7 @@ async def get_layer(file_name, layer, user_info, index):
             layer.name = layer.name.replace(replacement, '-')
         if layer.kind == 'type':
             typelayer = layers.TypeLayer()
-            typelayer.name = f"块_{layer.name}_{layer.left}_{layer.top}_{layer.width}_{layer.height}"
+            typelayer.name = f"{layer.name}_{layer.left}_{layer.top}_{layer.width}_{layer.height}"
             typelayer.kind = 'type'
             typelayer.left = layer.left
             typelayer.top = layer.top
@@ -83,7 +83,7 @@ async def get_layer(file_name, layer, user_info, index):
                 style_content += await typelayer.generate_css()
         else:
             imagelayer = layers.ImageLayer()
-            imagelayer.name = f"块_{layer.name}_{layer.left}_{layer.top}_{layer.width}_{layer.height}"
+            imagelayer.name = f"{layer.name}_{layer.left}_{layer.top}_{layer.width}_{layer.height}"
             imagelayer.kind = 'image'
             imagelayer.left = layer.left
             imagelayer.top = layer.top
