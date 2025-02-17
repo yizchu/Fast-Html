@@ -314,6 +314,13 @@ export default {
                 }
             }
             this.target = this.contextData.target;
+            const iframe = this.$refs.iframe;
+            const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+            const rect = this.target.getBoundingClientRect();
+            const iframeRect = iframe.getBoundingClientRect();
+            const scrollX = rect.left + iframe.contentWindow.scrollX - iframeRect.left - iframeRect.width / 2 + rect.width / 2;
+            const scrollY = rect.top + iframe.contentWindow.scrollY - iframeRect.top - iframeRect.height / 2 + rect.height / 2;
+            iframe.contentWindow.scrollTo(scrollX, scrollY);
             if (!(this.target === this.selected_element || this.selected_elements.includes(this.target))) {
                 this.target.style.boxShadow = '0px 0px 5px 2px rgba(255, 0, 0, 0.7)';
             }
