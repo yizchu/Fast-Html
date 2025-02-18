@@ -9,7 +9,7 @@
             <span>设置嵌套</span>
         </MenuItem>
     </Menu>
-    <div v-if="selectedMenu === 'edit-css'">
+    <div v-if="selectedMenu === 'edit-css'" class="edit-css-container">
         <EditCss />
     </div>
     <div v-if="selectedMenu === 'nest'">
@@ -17,8 +17,19 @@
 </template>
 
 <script>
-    import EditCss from './EditCss.vue'
+    import { mapState } from 'vuex';
+    import EditCss from './EditCss.vue';
+
     export default{
+        components: {
+            EditCss,
+        },
+        computed: {
+            ...mapState({
+                selected_element: state => state.Page.selected_element,
+                selected_elements: state => state.Page.selected_elements,
+            }),
+        },
         data() {
             return{
                 selectedMenu: 'edit-css',
@@ -32,3 +43,18 @@
     }
 </script>
 
+<style>
+.edit-css-container {
+  padding: 20px;
+  background-color: #f0f2f5;
+  flex-grow: 1;
+  overflow: auto;
+}
+
+.EditCss {
+    padding: 20px;
+    background-color: #f0f2f5;
+    height: 100%;
+    overflow: auto;
+}
+</style>
