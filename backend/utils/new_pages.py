@@ -1,5 +1,6 @@
 import os
 import shutil
+from threading import Thread
 from fastapi import UploadFile, File, HTTPException, APIRouter, Body
 
 from dirs import new_dir
@@ -43,8 +44,13 @@ async def delete_temp(page_name: str = Body(..., embed=True)):
 @router.post("/init-page/")
 async def init_pages():
     files = []
+    threads = []
     for file_name in os.listdir(new_dir):
-        await init_html(file_name, os.path.join(new_dir, file_name))
+        thread = Thread(target=init_html, args=(file_name, os.path.join(new_dir, file_name)))
         files.append(file_name)
+        threads.append(thread)
+        thread.start()
+    for thread in threads:
+        thread.join()
     shutil.rmtree(new_dir)
     return {"status": "success", "file": files[0], "cnt": len(files)}
