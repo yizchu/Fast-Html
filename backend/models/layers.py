@@ -30,12 +30,12 @@ class ImageLayer(Layer):
         super().__init__()
         self.image_path: str = None
 
-    async def generate_html(self) -> str:
+    def generate_html(self) -> str:
         return f'''
             <img src="{self.image_path}" alt="Not Found!" class="{self.name}"/>
         '''
 
-    async def generate_css(self) -> str:
+    def generate_css(self) -> str:
         return f'''
             .{self.name} {{
                 position: absolute;
@@ -70,12 +70,12 @@ class TypeLayer(Layer):
         self.underline: bool = False
         self.strikethrough: bool = False
 
-    async def generate_html(self) -> str:
+    def generate_html(self) -> str:
         return f'''
             <p class="{self.name}">{self.text} </p>
         '''
 
-    async def generate_css(self) -> str:
+    def generate_css(self) -> str:
         return f'''
             .{self.name} {{
                 position: absolute;
