@@ -1,13 +1,15 @@
 import os
-import asyncio
 from psd_tools import PSDImage
-from PIL import Image, ImageFont, ImageDraw
+from PIL import Image
 from models import layers
+from threading import Thread, Lock
 import logging
 from tools import to_html
 
+Lock = Lock()
 
-async def create_directories(file_name, base_dir):
+
+def create_directories(file_name, base_dir):
     if not os.path.exists(base_dir):
         os.makedirs(base_dir)
     files_in_static = [
@@ -20,31 +22,32 @@ async def create_directories(file_name, base_dir):
             os.makedirs(dir_path)
 
 
-async def init_html(file_name, temp_path):
-    global html_content, style_content, html_content_lock, style_content_lock
-    html_content_lock = asyncio.Lock()
-    style_content_lock = asyncio.Lock()
-    await create_directories(file_name, f"results/{file_name}/static")
+def init_html(file_name, temp_path):
+    global html_content, style_content
+    create_directories(file_name, f"results/{file_name}/static")
     psd_file = PSDImage.open(temp_path)
     user_info = {'title': file_name, 'width': psd_file.width, 'height': psd_file.height}
     style_content = ""
-    html_content = await to_html.init_html_content(file_name)
+    html_content = to_html.init_html_content(file_name)
+
+    def get_layer(layer, index):
+        if layer.is_group():
+            if layer.visible:
+                for sub_layer in layer._layers:
+                    get_layer(sub_layer, index)
+        elif layer.visible:
+            Thread(target=process_layer, args=(file_name, layer, user_info, index)).start()
+
     for index, root_layer in enumerate(psd_file._layers):
-        await get_layer(file_name, root_layer, user_info, index * 100)
-    await to_html.end_html(html_content, f"results/{file_name}/{file_name}.html")
-    await to_html.end_css(style_content, f"results/{file_name}/static/css/{file_name}.css")
+        get_layer(root_layer, index)
 
 
-async def get_layer(file_name, layer, user_info, index):
-    global html_content, style_content, html_content_lock, style_content_lock
-    if layer.is_group():
-        if layer.visible:
-            for sub_layer in layer._layers:
-                await get_layer(file_name, sub_layer, user_info, index)
-    elif layer.visible:
-        for replacement in layers.replacements:
-            layer.name = layer.name.replace(replacement, '-')
-        if layer.kind == 'type':
+def process_layer(file_name, layer, user_info, index):
+    global Lock, html_content, style_content
+    for replacement in layers.replacements:
+        layer.name = layer.name.replace(replacement, '-')
+    if layer.kind == 'type':
+        try:
             typelayer = layers.TypeLayer()
             typelayer.name = f"{layer.name}_{layer.left}_{layer.top}_{layer.width}_{layer.height}"
             typelayer.kind = 'type'
@@ -71,17 +74,17 @@ async def get_layer(file_name, layer, user_info, index):
             typelayer.leading = "normal" if style_sheet_data.get('AutoLeading', True) else style_sheet_data.get('Leading', 0)
             typelayer.underline = style_sheet_data.get('Underline', False)
             typelayer.strikethrough = style_sheet_data.get('Strikethrough', False)
-
-            # 误差校正
             typelayer.top -= 24
             typelayer.width += 28
             typelayer.height *= 2
-
-            async with html_content_lock:
-                html_content += await typelayer.generate_html()
-            async with style_content_lock:
-                style_content += await typelayer.generate_css()
-        else:
+            Lock.acquire()
+            html_content += typelayer.generate_html()
+            style_content += typelayer.generate_css()
+            Lock.release()
+        except Exception as e:
+            logging.error(f"Error processing type layer {layer.name}: {e}")
+    else:
+        try:
             imagelayer = layers.ImageLayer()
             imagelayer.name = f"{layer.name}_{layer.left}_{layer.top}_{layer.width}_{layer.height}"
             imagelayer.kind = 'image'
@@ -93,15 +96,21 @@ async def get_layer(file_name, layer, user_info, index):
             imagelayer.z_index = index
             if imagelayer.left > user_info['width'] or imagelayer.top > user_info['height'] or imagelayer.left + imagelayer.width < 0 or imagelayer.top + imagelayer.height < 0:
                 return
-            layer_image = layer.composite()
-            if layer_image:
-                pil_image = Image.frombytes('RGBA', layer_image.size, layer_image.tobytes())
-                try:
-                    pil_image.save(f"results/{file_name}/static/img/{imagelayer.name}.png")
-                    imagelayer.image_path = f"static/img/{imagelayer.name}.png"
-                except:
-                    return
-            async with html_content_lock:
-                html_content += await imagelayer.generate_html()
-            async with style_content_lock:
-                style_content += await imagelayer.generate_css()
+            process_image_layer(imagelayer, layer, file_name)
+            Lock.acquire()
+            html_content += imagelayer.generate_html()
+            style_content += imagelayer.generate_css()
+            Lock.release()
+        except Exception as e:
+            logging.error(f"Error processing image layer {layer.name}: {e}")
+
+
+def process_image_layer(imagelayer, layer, file_name):
+    layer_image = layer.composite()
+    if layer_image:
+        pil_image = Image.frombytes('RGBA', layer_image.size, layer_image.tobytes())
+        try:
+            pil_image.save(f"results/{file_name}/static/img/{imagelayer.name}.png")
+            imagelayer.image_path = f"static/img/{imagelayer.name}.png"
+        except Exception as e:
+            logging.error(f"Error saving image: {e}")

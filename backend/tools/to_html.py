@@ -1,7 +1,7 @@
 from models.layers import Layer
 
 
-async def init_html_content(file_name: str) -> str:
+def init_html_content(file_name: str) -> str:
     """
     Initialize the html content with the necessary tags and styles.
     """
@@ -27,7 +27,7 @@ async def init_html_content(file_name: str) -> str:
     '''
 
 
-async def end_html(html_content: str, html_path: str) -> None:
+def end_html(html_content: str, html_path: str) -> None:
     """
     Add the closing tags to the html content and write it to the output file.
     """
@@ -39,7 +39,7 @@ async def end_html(html_content: str, html_path: str) -> None:
         f.write(html_content)
 
 
-async def end_css(style_content: str, css_path: str) -> None:
+def end_css(style_content: str, css_path: str) -> None:
     """
     Write the style content to the css file.
     """
