@@ -8,7 +8,7 @@
 ```shell
 npm install
 ```
-## Run
+## Run Dev
 ```shell
 npm run dev
 ```

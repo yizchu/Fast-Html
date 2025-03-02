@@ -61,7 +61,7 @@ const config = ({ mode }) => {
             }
         },
         server: {
-            open: true
+            open: false
         },
         preview: {
             port: 5000
