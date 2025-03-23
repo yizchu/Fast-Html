@@ -8,9 +8,15 @@
 ```shell
 npm install
 ```
+
 ## Run Dev
 ```shell
 npm run dev
+```
+### Troubleshooting Electron Installation
+```shell
+npm install -g cnpm --registry=https://registry.npmmirror.com
+cnpm install electron --save
 ```
 ## Build
 ### Build for Production
