@@ -1,6 +1,6 @@
 huggingface_hub
 python-dotenv
-psd-tools==1.9.34
+psd-tools
 uvicorn
 pybase64
 fastapi
@@ -9,3 +9,4 @@ typing
 requests
 json5
 pillow
+sse_starlette
