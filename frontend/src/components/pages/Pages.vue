@@ -6,7 +6,7 @@
     <Button class="new-page" @click="show_newpage = true" type="primary">还没有工程? 去创建 =></Button>
     <li class="info">打开工程</li>
     <div class="dropdown-container">
-        <select name="pages" v-model="selectedPage" @change="onPageSelect">
+        <select :key="key" name="pages" v-model="selectedPage" @change="onPageSelect">
         <option value=""> --请选择一个工程-- </option>
         <option v-for="page in pages" :key="page" :value="page">
             {{ page }}
@@ -57,17 +57,25 @@
                 isEditable: false,
                 canSaveCancel: false,
                 loading: false,
+                key: 0,
             }
         },
         mounted() {
             this.fetchPages();
+        },watch: {
+            show_newpage(newVal, oldVal) {
+                if (oldVal === true && newVal === false) {
+                    this.fetchPages();
+                }
+            }
         },
         methods: {
-            ...mapMutations('Page', ['updatePageName', 'updateHtmlCss', 'updateOriginalContent']),
+            ...mapMutations('Page', ['updatePageName', 'updateHtmlCss', 'updateOriginalContent', 'updateEl', 'clearEls']),
             async fetchPages() {
                 try {
                     const response = await axios.get(`${this.backend_url}/get-page/`);
                     this.pages = response.data;
+                    this.key += 1;
                 } catch (error) {
                     console.error('Error fetching projects:', error);
                 }
@@ -75,6 +83,8 @@
             async onPageSelect() {
                 if (this.selectedPage) {
                     this.loading = true;
+                    this.updateEl(null);
+                    this.clearEls();
                     try {
                         const response = await axios.post(`${this.backend_url}/open-page/`, {page_name: this.selectedPage}, {
                             headers: {

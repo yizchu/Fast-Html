@@ -26,7 +26,11 @@
     "src/**/*.d.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
-    "src/store/page_store.js"
+    "src/store/page_store.js",
+    "toHtml.ts"
+  ],
+  "exclude": [
+    "node_modules"
   ],
   "references": [
     {

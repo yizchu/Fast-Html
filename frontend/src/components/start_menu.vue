@@ -1,14 +1,14 @@
 <template>
     <Card class="card">
         <h1>登录</h1>
-        <Menu mode="horizontal" :theme="theme" active-name="1" @on-select="user_selection">
+        <Menu mode="horizontal" :theme="theme" @on-select="user_selection">
             <MenuItem name="1">
-            <Icon type="ios-folder-open" />
-            打开工程
+                <Icon type="ios-folder-open" />
+                打开工程
             </MenuItem>
             <MenuItem name="2">
-            <Icon type="ios-add-circle-outline" />
-            新建工程
+                <Icon type="ios-add-circle-outline" />
+                新建工程
             </MenuItem>
         </Menu>
         <br>
@@ -42,15 +42,15 @@ export default {
 
 <style>
     .card {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    text-align: center;
-    top: 22rem;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    height: 30rem;
-    width: 26rem;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        text-align: center;
+        top: 22rem;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        height: 30rem;
+        width: 26rem;
     }
 
 </style>

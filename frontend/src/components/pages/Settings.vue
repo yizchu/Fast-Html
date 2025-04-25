@@ -46,9 +46,8 @@ export default {
             this.$emit('update:show_settings', false);
         },
         onSave() {
-            this.updateBackendUrl(this.inputUrl);
             this.originUrl = this.inputUrl;
-            console.log(this.backend_url);
+            this.updateBackendUrl(this.inputUrl);
         },
         onCancel() {
             this.inputUrl = this.originUrl;

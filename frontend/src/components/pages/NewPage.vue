@@ -33,6 +33,7 @@ export default {
     data() {
         return {
             loading: false,
+            key: 0,
         };
     },
     computed: {
@@ -41,6 +42,15 @@ export default {
         }),
     },
     methods: {
+        async fetchPages() {
+                try {
+                    const response = await axios.get(`${this.backend_url}/get-page/`);
+                    this.pages = response.data;
+                    this.key += 1;
+                } catch (error) {
+                    console.error('Error fetching projects:', error);
+                }
+        },
         async close() {
             this.$emit('update:show_newpage', false);
             await axios.delete(`${this.backend_url}/clear-temp/`);
@@ -74,8 +84,9 @@ export default {
                 if (res.data.status === 'success') {
                     this.$Notice.success({
                         title: 'Success',
-                        desc: `${res.data.file} 等 ${res.data.cnt} 个工程被成功创建, 请刷新页面以选取打开。`
+                        desc: `${res.data.file} 等 ${res.data.cnt} 个工程被成功创建, 请选取打开。`
                     });
+                    this.fetchPages();
                     this.close();
                 } else {
                     this.$Message.error('创建失败!');

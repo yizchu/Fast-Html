@@ -5,7 +5,7 @@ import settingStore from './settings_store'
 const store = createStore({
     modules: {
         Page: pageStore,
-        Settings: settingStore
+        Settings: settingStore,
     }
 })
 

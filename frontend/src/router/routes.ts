@@ -3,14 +3,23 @@ import type { RouteRecordRaw } from 'vue-router'
 
 const routes: RouteRecordRaw[] = [
     {
-        path: '/home',
-        component: () => import('@/components/start_menu.vue'),
-    },
-
-    {
         path: '/',
-        component: () => import('@/components/dev_page.vue'),
+        component: () => import('@/components/test.vue'),
     },
+    {
+        path: '/test',
+        component: () => import('@/components/test.vue'),
+        meta: {
+            title: 'Fast HTML',
+        }
+    },
+    {
+        path: '/style',
+        component: () => import('@/components/dialog/style.vue'),
+        meta: {
+            title: '样式',
+        }
+    }
 
 ]
 

@@ -4,6 +4,7 @@ import { createHtmlPlugin } from 'vite-plugin-html'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 const autoprefixer = require('autoprefixer')
 const path = require('path')
+import commonjs from 'rollup-plugin-commonjs';
 
 const config = ({ mode }) => {
     const isProd = mode === 'production'
@@ -22,7 +23,10 @@ const config = ({ mode }) => {
                         title: APP_TITLE,
                     },
                 }
-            })
+            }),
+            commonjs({
+                extensions: ['.js']
+            }),
         ],
         build: {
             target: 'es2015',
@@ -36,6 +40,11 @@ const config = ({ mode }) => {
                 output: {
                     chunkFileNames: 'js/[name].[hash].js',
                     entryFileNames: 'js/[name].[hash].js',
+                    manualChunks(id) {
+                        if (id.includes('node_modules')) {
+                            return 'vendor';
+                        }
+                    }
                 }
             }
         },

@@ -3,7 +3,7 @@
         <PagesOverview />
     </div>
     <div class="info-wrapper">
-        <Info v-if="selected_element || selected_elements.length > 0"/>
+        <Info v-if="selected_element || selected_elements.length > 0" class="info"/>
         <p v-if="!selected_element && selected_elements.length===0">
             请选取至少一个元素
         </p>
@@ -11,7 +11,6 @@
     <div class="pagePreview-wrapper">
         <PagePreview class="pagePreview"/>
     </div>
-
 </template>
 
 <script>
@@ -55,17 +54,18 @@
 
 .info-wrapper {
     position: absolute;
+    display: flex;
     top: 0;
     left: 6.5%;
     width: 33.5%;
     height: 60%;
     background-color: #f0f0f0;
     border: 1px solid #ccc;
+    align-items: center;
+    justify-content: center;
 }
 
 .info-wrapper p {
     font-size: 24px;
-    text-align: center;
-    margin-top: 40%;
 }
 </style>

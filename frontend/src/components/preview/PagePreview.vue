@@ -207,7 +207,8 @@ export default {
                     this.removeHighlightFromTree(this.selectedTreeNode);
                     this.selected_element.style.boxShadow = '';
                     this.updateEl(null);
-                } else {
+                }
+                else {
                     if (this.selected_element) {
                         this.selected_element.style.boxShadow = '';
                         this.removeHighlightFromTree(this.selectedTreeNode);

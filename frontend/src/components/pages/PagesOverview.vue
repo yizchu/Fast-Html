@@ -1,6 +1,6 @@
 <template>
     <Button class="overview" @click="overview = true" type="primary">工程总览</Button>
-    <Drawer title="工程总览" placement="left" width=40 :closable="false" v-model="overview">
+    <Drawer title="工程总览" placement="left" width="40" :closable="false" v-model="overview">
         <Pages/>
         <div class="settings-wrapper">
             <div class="settings-container" @mouseenter="show = true" @mouseleave="show = false" @click="show_settings=true">

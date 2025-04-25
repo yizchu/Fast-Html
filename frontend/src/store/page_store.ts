@@ -1,8 +1,8 @@
 const pageStore = {
     namespaced: true,
     state: {
-        html_css_content: '',   // 预览所用
-        original_content: '',   // 后端修改所用
+        html_css_content: '',   // 当前
+        original_content: '',   // 历史，撤销用，换成栈结构更好
         page_name: '',
         selected_element: null,
         selected_elements: [],
