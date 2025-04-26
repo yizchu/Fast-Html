@@ -1,0 +1,275 @@
+{
+    "name": {
+        "简体中文": [
+            "名称",
+            "图层的唯一标识名称"
+        ],
+        "English": [
+            "name",
+            "The unique identifier name of the layer"
+        ]
+    },
+    "kind": {
+        "简体中文": [
+            "类型",
+            "图层类型（像素图层/文字图层等）"
+        ],
+        "English": [
+            "kind",
+            "Layer type (pixel layer/type layer etc.)"
+        ]
+    },
+    "left": {
+        "简体中文": [
+            "左偏移",
+            "图层左侧相对于父容器的偏移量"
+        ],
+        "English": [
+            "left",
+            "The offset of the layer's left edge relative to its parent container"
+        ],
+        "css": "left"
+    },
+    "top": {
+        "简体中文": [
+            "顶部偏移",
+            "图层顶部相对于父容器的偏移量"
+        ],
+        "English": [
+            "top",
+            "The offset of the layer's top edge relative to its parent container"
+        ],
+        "css": "top"
+    },
+    "width": {
+        "简体中文": [
+            "宽度",
+            "图层的显示宽度"
+        ],
+        "English": [
+            "width",
+            "The display width of the layer"
+        ],
+        "css": "width"
+    },
+    "height": {
+        "简体中文": [
+            "高度",
+            "图层的显示高度"
+        ],
+        "English": [
+            "height",
+            "The display height of the layer"
+        ],
+        "css": "height"
+    },
+    "opacity": {
+        "简体中文": [
+            "不透明度",
+            "图层内容的不透明度（0-1.0）"
+        ],
+        "English": [
+            "opacity",
+            "The opacity of the layer's content (0-1.0)"
+        ],
+        "css": "opacity"
+    },
+    "visible": {
+        "简体中文": [
+            "可见性",
+            "控制图层是否显示（true为可见，false为隐藏）"
+        ],
+        "English": [
+            "visibility",
+            "Controls whether the layer is visible (true) or hidden (false)"
+        ],
+        "css": "visibility"
+    },
+    "transform": {
+        "简体中文": [
+            "变换",
+            "应用于图层的几何变换（如旋转、缩放、倾斜）"
+        ],
+        "English": [
+            "transform",
+            "Geometric transformations applied to the layer (e.g., rotate, scale, skew)"
+        ],
+        "css": [
+            "transform",
+            "matrix"
+        ]
+    },
+    "image_path": {
+        "简体中文": [
+            "图像路径",
+            "图层使用的基础图像文件的存储路径"
+        ],
+        "English": [
+            "image path",
+            "The file path of the base image used by the layer"
+        ],
+        "css": [
+            "background-image",
+            "url"
+        ]
+    },
+    "stroke": {
+        "简体中文": [
+            "描边",
+            "在图层边缘添加的轮廓线条"
+        ],
+        "English": [
+            "stroke",
+            "The outline effect applied to the layer's edges"
+        ],
+        "css": [
+            "border-left",
+            "border-top",
+            "border-right",
+            "border-bottom"
+        ]
+    },
+    "text": {
+        "简体中文": [
+            "文本内容",
+            "图层中显示的具体文字内容"
+        ],
+        "English": [
+            "text",
+            "The actual textual content displayed in the layer"
+        ],
+        "css": "None"
+    },
+    "font_family": {
+        "简体中文": [
+            "字体族",
+            "文本内容所使用的字体名称（如Arial, 宋体）"
+        ],
+        "English": [
+            "font family",
+            "The font used for the text content (e.g., Arial, SimSun)"
+        ],
+        "css": "font-family"
+    },
+    "font_size": {
+        "简体中文": [
+            "字体大小",
+            "文本字符的显示尺寸"
+        ],
+        "English": [
+            "font size",
+            "The display size of the text characters"
+        ],
+        "css": "font-size"
+    },
+    "fill_color": {
+        "简体中文": [
+            "填充颜色",
+            "文本字符的主要颜色"
+        ],
+        "English": [
+            "fill color",
+            "The primary color of the text characters"
+        ],
+        "css": "color"
+    },
+    "justification": {
+        "简体中文": [
+            "对齐方式",
+            "文本段落的总对齐方式（左对齐/居中/右对齐）"
+        ],
+        "English": [
+            "justification",
+            "The overall alignment of text paragraphs (left/center/right)"
+        ],
+        "css": "text-align"
+    },
+    "firstline_indent": {
+        "简体中文": [
+            "首行缩进",
+            "段落第一行的缩进量"
+        ],
+        "English": [
+            "first line indent",
+            "The indentation of the first line in a paragraph"
+        ],
+        "css": "text-indent"
+    },
+    "space_before": {
+        "简体中文": [
+            "段前间距",
+            "段落上方的空白间距量"
+        ],
+        "English": [
+            "space before",
+            "The blank space above paragraphs"
+        ],
+        "css": "margin-top"
+    },
+    "space_after": {
+        "简体中文": [
+            "段后间距",
+            "段落下方的空白间距量"
+        ],
+        "English": [
+            "space after",
+            "The blank space below paragraphs"
+        ],
+        "css": "margin-bottom"
+    },
+    "auto_hyphenate": {
+        "简体中文": [
+            "自动连字",
+            "控制是否在单词换行时自动添加连字符"
+        ],
+        "English": [
+            "auto hyphenate",
+            "Controls whether to automatically add hyphens when words break"
+        ],
+        "css": "hyphens"
+    },
+    "leading": {
+        "简体中文": [
+            "行高",
+            "文本行之间的垂直间距量"
+        ],
+        "English": [
+            "leading",
+            "The vertical space between lines of text"
+        ],
+        "css": "line-height"
+    },
+    "tracking": {
+        "简体中文": [
+            "字距调整",
+            "统一调整所有字符间距的数值"
+        ],
+        "English": [
+            "tracking",
+            "Uniform adjustment of spacing between all characters"
+        ],
+        "css": "letter-spacing"
+    },
+    "underline": {
+        "简体中文": [
+            "下划线",
+            "控制是否在文本下方添加装饰线"
+        ],
+        "English": [
+            "underline",
+            "Controls whether to add a decorative line below the text"
+        ],
+        "css": "text-decoration-line"
+    },
+    "strikethrough": {
+        "简体中文": [
+            "删除线",
+            "控制是否在文本中间添加装饰线"
+        ],
+        "English": [
+            "strikethrough",
+            "Controls whether to add a decorative line through the text"
+        ],
+        "css": "text-decoration-line"
+    }
+}

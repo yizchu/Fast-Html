@@ -1,13 +1,10 @@
-from typing import Literal
-
-
 class Layer:
     """
     Including all kinds of layers.
     """
 
-    def __init__(self):
-        self.name: str = ''
+    def __init__(self, name: str = ''):
+        self.name: str = name
         self.kind: str = ''
         self.left: float = 0
         self.top: float = 0
@@ -17,7 +14,65 @@ class Layer:
         self.visible: bool = True
         self.z_index: float = 0
 
-    async def get_self_attributes(self):
+    def __setattr__(self, key, value):
+        replacements = [
+            ' ',
+            '.',
+            '?',
+            '!',
+            '@',
+            '#',
+            '$',
+            "%",
+            "^",
+            "&",
+            "*",
+            "-",
+            "+",
+            "=",
+            ":",
+            ";",
+            ",",
+            "<",
+            ">",
+            "/",
+            "\\",
+            "|",
+            "{",
+            "}",
+            "[",
+            "]",
+            "(",
+            ")",
+            "'",
+            '"',
+            "`",
+            "~",
+            "，",
+            "、",
+            "。",
+            "；",
+            "：",
+            "？",
+            "！",
+            "“",
+            "”",
+            "‘",
+            "’",
+            "（",
+            "）",
+            "【",
+            "】",
+            "《",
+            "》",
+            "——",
+        ]
+        if key == 'name':
+            for replacement in replacements:
+                value = value.replace(replacement, '-')
+        super().__setattr__(key, value)
+
+    def get_self_attributes(self):
         return (key for key in self.__dict__.keys())
 
 
@@ -26,8 +81,8 @@ class ImageLayer(Layer):
     layer.kind == 'image'(including 'pixel', 'shape' and 'smartobject')
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, name: str = ''):
+        super().__init__(name)
         self.image_path: str = None
 
     def generate_html(self) -> str:
@@ -55,8 +110,8 @@ class TypeLayer(Layer):
     layer.kind == 'type'
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, name: str = ''):
+        super().__init__(name)
         self.text: str = ''
         self.font_family: list = []
         self.font_size: float = 0
@@ -98,57 +153,3 @@ class TypeLayer(Layer):
                 {f'text-decoration: {"underline" if self.underline else "line-through" if self.strikethrough else "none"};' if self.underline or self.strikethrough else ''}
             }}
         '''
-
-
-replacements = [
-    ' ',
-    '.',
-    '?',
-    '!',
-    '@',
-    '#',
-    '$',
-    "%",
-    "^",
-    "&",
-    "*",
-    "-",
-    "+",
-    "=",
-    ":",
-    ";",
-    ",",
-    "<",
-    ">",
-    "/",
-    "\\",
-    "|",
-    "{",
-    "}",
-    "[",
-    "]",
-    "(",
-    ")",
-    "'",
-    '"',
-    "`",
-    "~",
-    "，",
-    "、",
-    "。",
-    "；",
-    "：",
-    "？",
-    "！",
-    "“",
-    "”",
-    "‘",
-    "’",
-    "（",
-    "）",
-    "【",
-    "】",
-    "《",
-    "》",
-    "——",
-]

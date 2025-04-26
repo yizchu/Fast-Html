@@ -29,6 +29,7 @@ def init_html(file_name, temp_path):
     user_info = {'title': file_name, 'width': psd_file.width, 'height': psd_file.height}
     style_content = ""
     html_content = to_html.init_html_content(file_name)
+    threads = []
 
     def get_layer(layer, index):
         if layer.is_group():
@@ -36,20 +37,26 @@ def init_html(file_name, temp_path):
                 for sub_layer in layer._layers:
                     get_layer(sub_layer, index)
         elif layer.visible:
-            Thread(target=process_layer, args=(file_name, layer, user_info, index)).start()
+            thread = Thread(target=process_layer, args=(file_name, layer, user_info, index))
+            thread.start()
+            threads.append(thread)
 
     for index, root_layer in enumerate(psd_file._layers):
-        get_layer(root_layer, index)
+        get_layer(root_layer, index * 100)
+
+    for thread in threads:
+        thread.join()
+
+    to_html.end_css(style_content, f"results/{file_name}/static/css/{file_name}.css")
+    to_html.end_html(html_content, f"results/{file_name}/{file_name}.html")
 
 
 def process_layer(file_name, layer, user_info, index):
     global Lock, html_content, style_content
-    for replacement in layers.replacements:
-        layer.name = layer.name.replace(replacement, '-')
+    name = f"元素_{layer.name}_{layer.left}_{layer.top}_{layer.width}_{layer.height}"
     if layer.kind == 'type':
         try:
-            typelayer = layers.TypeLayer()
-            typelayer.name = f"{layer.name}_{layer.left}_{layer.top}_{layer.width}_{layer.height}"
+            typelayer = layers.TypeLayer(name)
             typelayer.kind = 'type'
             typelayer.left = layer.left
             typelayer.top = layer.top
@@ -85,8 +92,7 @@ def process_layer(file_name, layer, user_info, index):
             logging.error(f"Error processing type layer {layer.name}: {e}")
     else:
         try:
-            imagelayer = layers.ImageLayer()
-            imagelayer.name = f"{layer.name}_{layer.left}_{layer.top}_{layer.width}_{layer.height}"
+            imagelayer = layers.ImageLayer(name)
             imagelayer.kind = 'image'
             imagelayer.left = layer.left
             imagelayer.top = layer.top
